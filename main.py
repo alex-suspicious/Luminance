@@ -121,6 +121,9 @@ except Exception as e:
 	#else:
 	#	result = func_done()
 
+	if( "Response" in str(type(result)) ):
+		return result
+
 	return web.Response(text=result)
 
 async def all_routing( request, index = False ):
@@ -220,7 +223,7 @@ def on_closed():
 	t.stop()
 
 # Open website
-window = webview.create_window('Luminance', 'http://localhost:27576', width=800, height=500)
+window = webview.create_window('Luminance', 'http://localhost:27576', width=1280, height=720)
 window.events.closed += on_closed
 t.start()
 webview.start()
