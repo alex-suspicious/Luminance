@@ -1,10 +1,8 @@
 tqdm
 numpy
-scipy
 aiohttp
 beautifulsoup4
 requests
 io
 tk
 pywebview
-threading

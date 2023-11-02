@@ -1,17 +1,17 @@
-#import webview
 import os
 
 import asyncio
 import functions
 import plugins
+import aiohttp
 from aiohttp import web
 
 import sys
 from PIL import Image, ImageEnhance
 import json
-import inspect
 import webbrowser
 import io
+import tkinter
 from tkinter import *
 import webview 
 import threading
@@ -24,6 +24,10 @@ reflection_roughness_constant = 1
 ior_constant = 0
 metallic_constant = 0
 emissive_intensity = 0"""
+
+webui_dir = "webui"
+if( hasattr(sys,"_MEIPASS") ):
+	webui_dir = sys._MEIPASS + "/webui"
 
 req_types = {
 	"html":"text/html",
@@ -54,7 +58,7 @@ cache_types = {
 	"hdr":True
 }
 
-neededDirectories = []
+neededDirectories = ["plugins"]
 
 class StoppableThread(threading.Thread):
 	def __init__(self,  *args, **kwargs):
@@ -118,32 +122,13 @@ except Exception as e:
 
 	return web.Response(text=result)
 
-def returnNormal(request):
-	requestNew = str(request).replace("<Request GET ","").replace(" >","")
-	if( requestNew == "/<" ):
-		return
-
-	fileName = requestNew.split("/")[-1]
-
-	LightspeedOctahedralConverter.convert_octahedral_file_to_dx("textures/processing/normals/" + fileName, "webui/textures/temp/" + fileName)
-
-	try:
-		f = open("webui/textures/temp/" + fileName, "rb")
-		file = f.read()
-		f.close()
-	except Exception as e:
-		return e
-	
-
-	return web.Response( body=file, content_type="image/*")
-
 async def all_routing( request, index = False ):
 	requestNew = str(request).replace("<Request GET ","").replace(" >","")
 	if( requestNew == "/<" ):
 		return
 
 	if( index ):
-		requestNew = "/index.html"
+		requestNew = "index.html"
 
 	fileType = requestNew.split(".")
 	if( "." not in requestNew ):
@@ -160,14 +145,14 @@ async def all_routing( request, index = False ):
 
 	if( "image" in reqType or "octet" in reqType or "woff2" in reqType ):
 		try:
-			f = open("webui/" + requestNew, "rb")
+			f = open( (webui_dir + "/" + requestNew), "rb")
 			file = f.read()
 			f.close()
 			return web.Response( body=file, content_type=reqType)
 		except Exception as e:
 			try:
 				requestNew = requestNew.replace("upscaled","diffuse")
-				f = open("webui/" + requestNew, "rb")
+				f = open((webui_dir + "/" + requestNew), "rb")
 				file = f.read()
 				f.close()
 				return web.Response( body=file, content_type=reqType)
@@ -175,7 +160,7 @@ async def all_routing( request, index = False ):
 				return
 
 
-	f = open("webui/" + requestNew, "r", encoding="utf8")
+	f = open((webui_dir + "/" + requestNew), "r", encoding="utf8")
 	file = f.read()
 	f.close()
 
@@ -190,101 +175,7 @@ async def all_routing( request, index = False ):
 async def index_routing( request ):
 	return await all_routing(request, True)
 
-async def processing_routing( request ):
-	requestNew = str(request).replace("<Request GET ","").replace(" >","")
-	if( requestNew == "/<" ):
-		return
 
-	fileType = requestNew.split(".")
-	if( "." not in requestNew ):
-		requestNew = requestNew + ".html"
-		fileType = [requestNew,"html"]
-
-
-	if( fileType[len(fileType)-1].split("?")[0] == "map" ):
-		return
-
-	reqType = req_types[ fileType[len(fileType)-1].split("?")[0] ]
-
-	cache = cache_types[ fileType[len(fileType)-1].split("?")[0] ]
-
-	path = f"materials/" + requestNew.split("/")[-1].replace(".png",".mat")
-	#print(path)
-	exists = os.path.exists(path)
-	if( not exists ):
-		try:
-			f = open(path, "w", encoding="utf8")
-			f.write( default_material )
-			f.close()
-		except Exception as e:
-			pass
-			#print( str(e) )
-
-	downscale = False
-	if( "thumbnail" in requestNew ):
-		downscale = True
-
-	if( "image" in reqType or "octet" in reqType or "woff2" in reqType ):
-		if( downscale ):
-			requestNew = requestNew.replace("thumbnail","upscaled")
-
-			try:
-				img = Image.open("textures/" + requestNew, mode='r')
-				img_byte_arr = io.BytesIO()
-
-				newsize = (110, 110)
-				img = img.resize(newsize)
-
-				img.save(img_byte_arr, format="png")
-				img_byte_arr = img_byte_arr.getvalue()
-
-				return web.Response( body=img_byte_arr, content_type=reqType)
-			except Exception as e:
-				try:
-					requestNew = requestNew.replace("upscaled","diffuse")
-					img = Image.open("textures/" + requestNew, mode='r')
-					img_byte_arr = io.BytesIO()
-
-					newsize = (110, 110)
-					img = img.resize(newsize)
-
-					img.save(img_byte_arr, format="png")
-					img_byte_arr = img_byte_arr.getvalue()
-
-					return web.Response( body=img_byte_arr, content_type=reqType)
-				except Exception as e:
-					print( e )
-		else:
-			try:
-				f = open("textures/" + requestNew, "rb")
-				file = f.read()
-				f.close()
-				return web.Response( body=file, content_type=reqType)
-			except Exception as e:
-				try:
-					requestNew = requestNew.replace("upscaled","diffuse")
-					f = open("textures/" + requestNew, "rb")
-					file = f.read()
-					f.close()
-					return web.Response( body=file, content_type=reqType)
-				except Exception as e:
-					return
-
-	try:
-		f = open("textures/" + requestNew, "r", encoding="utf8")
-		file = f.read()
-		f.close()
-	except Exception as e:
-		return
-
-
-	headers = {}
-	if( cache ):
-		headers.update( {'Cache-Control': "max-age=86400"} )
-
-	response = web.Response( text=file, content_type=reqType, headers=headers)
-	return response
-	
 async def plugins_routing( request ):
 	pluginName = request.match_info.get('name', "error")
 	f = open("plugins/" + pluginName + "/index.html", "r", encoding="utf8")
@@ -299,10 +190,7 @@ def aiohttp_server():
 
 	app = web.Application()
 	app.add_routes([web.get('/callback/{key:.+}', callback)])
-	app.add_routes([web.get('/processing/normal/{key:.+}', returnNormal)])
 
-	
-	app.add_routes([web.get("/processing/{key:.+}", processing_routing)])
 	app.add_routes([web.get(r"/plugin/{name}", plugins_routing)])
 	app.add_routes([web.get("/{key:.+}", all_routing)])
 	app.router.add_get('/', index_routing)
@@ -327,14 +215,11 @@ def run_server(runner):
 
 t = StoppableThread(target=run_server, args=(aiohttp_server(),))
 # define an instance of tkinter
-tk = Tk()
-tk.geometry("800x450")
-
 def on_closed():
 	t.stop()
 
 # Open website
-window = webview.create_window('Luminance', 'http://localhost:27576')
+window = webview.create_window('Luminance', 'http://localhost:27576', width=800, height=500)
 window.events.closed += on_closed
 t.start()
 webview.start()
