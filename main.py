@@ -15,6 +15,7 @@ import tkinter
 from tkinter import *
 import webview 
 import threading
+import inspect
 
 
 default_material = """@opaque
