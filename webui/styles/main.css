@@ -2,6 +2,10 @@ body{
 	background-color: rgb(0, 0, 0);
 }
 
+*{
+	color: white;
+}
+
 body {
     background: black;
     margin: 0;
@@ -13,33 +17,183 @@ html, body {
     height: 100%;
 }
 
-img.bg {
-				background-color: black;
-        /* Set rules to fill background */
-        min-height: 100%;
+.swiper-background {
+				position: absolute !important;
+        min-height: 100vh;
         min-width: 1024px;
 
         /* Set up proportionate scaling */
-        width: 100%;
+        width: 100vw;
         height: auto;
 
         /* Set up positioning */
-        position: absolute;
         top: 0;
         left: 0;
 
-        z-index: -100;
-        filter: blur(10px) brightness(50%);
 }
 
+
+.github-avatar{
+	width: 30px;
+	height: 30px;
+	margin-right: 5px;
+}
+
+
+.github-avatar > img{
+	width: 30px;
+	border-radius: 100px;
+	transition: all 0.3s;
+	transform: scale(1.0) translateY(0px);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+}
+
+.github-avatar:Hover > img{
+	transform: scale(1.2) translateY(-9px);
+	box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+}
 
 *::-webkit-scrollbar {
   display: none;
 }
 
 .main{
-	width: 300px;
+	position: absolute !important;
+	width: 310px;
 	height: 100vh;
 	padding: 20px;
-	background-color: rgba(0, 0, 0, 0.6);
+	z-index: 5;
+	background-color: rgba(0, 0, 0, 0.5);
+	border-right: 1px solid rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(40px) saturate(120%) brightness(125%);
+	backdrop-filter: blur(40px) saturate(120%) brightness(125%);
+	box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.3);
+}
+
+.swiper-backgrounds-parent{
+				position: absolute !important;
+        min-height: 100vh;
+        min-width: 1024px;
+
+        /* Set up proportionate scaling */
+        width: 100vw;
+        height: 100vh;
+
+        /* Set up positioning */
+        top: 0;
+        left: 0;
+        overflow: visible !important;
+}
+
+.screen{
+	position: absolute;
+	width: calc( 100vw - 310px );
+	height: 100vh;
+	right: 0;
+	text-align: center;
+	background-color: rgba(0, 0, 0, 0);
+}
+
+.swiper-screenshots-parent{
+	margin-top: calc( 50vh - ( 100vh - 300px )/2 );
+	transform: translateY(-220px);
+}
+
+.swiper-screenshot{
+	height: calc( 100vh - 300px );
+	border: 1px solid rgba(120, 120, 120, 1);
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
+	margin-bottom: 100px;
+	transition: all 1s;
+	z-index: -5;
+}
+
+.bottom{
+	position: absolute !important;
+	width: calc( 100vw - 310px - 200px );
+	height: 35px;
+	padding: 20px;
+	padding-top: 7px;
+	z-index: 5;
+	right: 100px;
+	bottom: -1px;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(40px) saturate(120%) brightness(125%);
+	backdrop-filter: blur(40px) saturate(120%) brightness(125%);
+	box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.3);
+}
+
+.swiper-slide-screenshot{
+	padding-top: 100px;
+	background-color: rgba(0, 0, 0, 0);
+	transition: all 1s;
+	transform: scale(0.8) !important;
+}
+
+.swiper-slide-screenshot.swiper-slide-active{
+	transform: scale(1) !important;
+}
+
+
+.swiper-slide-active > .swiper-screenshot{
+	box-shadow: 0px 25px 60px rgba(0, 0, 0, 0.4) !important;
+}
+
+.swiper{
+	background-color: rgba(0, 0, 0, 0);
+}
+
+.swiper-pagination-bullet{
+	transform: translateY(-80px);
+	background-color: white !important;
+	color: white !important;
+	border-radius: 0px !important;
+	height: 1px !important;
+	width: 10px !important;
+	opacity: 0.8;
+	transition: all 0.3s;
+}
+
+.swiper-pagination-bullet-active{
+	opacity: 1;
+	width: 30px !important;
+}
+
+.btn-luminance{
+	width: 200px;
+	height: 27px;
+	font-size: 15px;
+	padding: 0;
+	background-color: rgba(255, 255, 255, 0);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	color: white;
+	transition: all 0.3s;
+	transform: scale(1.0);
+	margin-bottom: 20px;
+}
+
+.btn-luminance:Hover{
+	transform: scale(1.05);
+	background-color: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.btn-luminance:Active{
+	transform: scale(0.9);
+	background-color: rgba(255, 255, 255, 0.4) !important;
+	border: 1px solid rgba(255, 255, 255, 1);
+	transition: all 0s;
+}
+
+
+.main-buttons{
+	padding: 0pxs;
+	position: absolute;
+	width: 310px;
+	height: 100vh;
+	text-align: center;
+	margin: -20px;
+	padding-top: calc(50vh - 100px);
 }

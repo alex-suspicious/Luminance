@@ -16,6 +16,11 @@ from tkinter import *
 import webview 
 import threading
 import inspect
+import pathlib
+import zipfile
+import shutil
+import requests
+import base64
 
 
 default_material = """@opaque
